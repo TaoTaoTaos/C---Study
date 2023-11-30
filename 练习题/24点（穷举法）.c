@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 /*程序的主要步骤如下：
 
 1.用户输入四个1-13的数，这四个数存储在数组a[]中。
