@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <math.h>
 #include <time.h>
+#include <string.h>
+
 /*程序的主要步骤如下：
 
 1.用户输入四个1-13的数，这四个数存储在数组a[]中。
@@ -22,6 +24,8 @@ A(B(C_D))、
 
 int a[4];                           // 数组a[]用于存放用户输入的四个操作数
 char ope[4] = {'+', '-', '*', '/'}; // 数组ope[]用于存放四类运算符
+char solutions[1000][100];          // 存储所有可能的解决方案
+int solution_count = 0;             // 记录解决方案的数量
 
 // num()函数用于让用户输入四个1-13的数，并存储在数组a[]中。
 void num()
@@ -115,7 +119,54 @@ int express_5(int i, int j, int k, int t, char ope1, char ope2, char ope3)
     return x3;
 }
 
-void game1() // 输入数字，系统自己解答
+
+void find_solutions(int i, int j, int k, int t)
+{
+    int x, y, z;
+    char p, q, r;
+
+    for (x = 0; x < 4; x++)
+    {
+        p = ope[x];
+        for (y = 0; y < 4; y++)
+        {
+            q = ope[y];
+            for (z = 0; z < 4; z++)
+            {
+                r = ope[z];
+                int result1, result2, result3, result4, result5;
+                result1 = express_1(i, j, k, t, p, q, r);
+                result2 = express_2(i, j, k, t, p, q, r);
+                result3 = express_3(i, j, k, t, p, q, r);
+                result4 = express_4(i, j, k, t, p, q, r);
+                result5 = express_5(i, j, k, t, p, q, r);
+
+                if (result1 == 24)
+                {
+                    sprintf(solutions[solution_count++], "((%d %c %d) %c %d) %c %d", i, p, j, q, k, r, t);
+                }
+                if (result2 == 24)
+                {
+                    sprintf(solutions[solution_count++], "(%d %c (%d %c %d)) %c %d", i, p, j, q, k, r, t);
+                }
+                if (result3 == 24)
+                {
+                    sprintf(solutions[solution_count++], "%d %c ((%d %c %d) %c %d)", i, p, j, q, k, r, t);
+                }
+                if (result4 == 24)
+                {
+                    sprintf(solutions[solution_count++], "%d %c (%d %c (%d %c %d))", i, p, j, q, k, r, t);
+                }
+                if (result5 == 24)
+                {
+                    sprintf(solutions[solution_count++], "(%d %c %d) %c (%d %c %d)", i, p, j, q, k, r, t);
+                }
+            }
+        }
+    }
+}
+
+void game1()
 {
     num(); // 获取输入的数字
 
@@ -125,58 +176,20 @@ void game1() // 输入数字，系统自己解答
     k = a[2];
     t = a[3];
 
-    int x, y, z;
-    char p, q, r;
+    solution_count = 0;         // 重置解决方案计数器
+    find_solutions(i, j, k, t); // 查找所有可能的解决方案
 
-    int flag = 0; // 添加一个标志变量，初始值为0
-
-    for (x = 0; x < 4; x++) // 三层循环遍历所有可能的情况，遇到==24的情况就打印出这个表达式，并将标志变量设置为1
-    {
-        p = ope[x];
-        for (y = 0; y < 4; y++)
-        {
-            q = ope[y];
-            for (z = 0; z < 4; z++)
-            {
-                r = ope[z];
-                if (express_1(i, j, k, t, p, q, r) == 24)
-                {
-                    printf("((%d %c %d) %c %d) %c %d = 24\n", i, p, j, q, k, r, t);
-                    flag = 1; // 如果找到了满足条件的表达式，就把标志变量设为1
-                }
-                if (express_2(i, j, k, t, p, q, r) == 24)
-                {
-                    printf("(%d %c (%d %c %d)) %c %d = 24\n", i, p, j, q, k, r, t);
-                    flag = 1;
-                }
-                if (express_3(i, j, k, t, p, q, r) == 24)
-                {
-                    printf("%d %c ((%d %c %d) %c %d) = 24\n", i, p, j, q, k, r, t);
-                    flag = 1;
-                }
-                if (express_4(i, j, k, t, p, q, r) == 24)
-                {
-                    printf("%d %c (%d %c (%d %c %d)) = 24\n", i, p, j, q, k, r, t);
-                    flag = 1;
-                }
-                if (express_5(i, j, k, t, p, q, r) == 24)
-                {
-                    printf("(%d %c %d) %c (%d %c %d) = 24\n", i, p, j, q, k, r, t);
-                    flag = 1;
-                }
-            }
-        }
-    }
-
-    if (flag == 0) // 如果所有的循环结束后，标志变量仍然为0，就输出"没有值等于24"
-    {
+    if (solution_count == 0)
+    { // 如果没有找到解决方案，就输出"没有值等于24"
         printf("这四张牌组合不了24\n");
     }
-
-    if (flag == 1)
-    { // 如果标志变量为1
-        printf("\n");
+    else
+    {
         printf("所有能够出现24点的表达式有这些：\n");
+        for (int i = 0; i < solution_count; i++)
+        {
+            printf("%s\n", solutions[i]);
+        }
     }
 }
 void game2()
@@ -194,90 +207,65 @@ void game2()
     k = a[2];
     t = a[3];
 
-    printf("电脑生成的四个数字是：%d, %d, %d, %d\n", i, j, k, t);
-    printf("请尝试解答，如果无法解答，输入'1'来查看答案。\n");
-     char user_input[100];
-    scanf("%s", user_input);
+    solution_count = 0;         // 重置解决方案计数器
+    find_solutions(i, j, k, t); // 查找所有可能的解决方案
 
-if(strcmp(user_input, "1") == 0) 
+    printf("请用加减乘除运算，使得这四个数的结果为24：\n");
+    printf("%d %d %d %d\n", i, j, k, t);
 
+    
 
+    // 在用户输入答案后，检查答案是否在解决方案中
+    char user_solution[100];
+    printf("请输入您的答案：\n");
+    scanf("%s", user_solution);
+
+   
+    int s;
+    for (s = 0; s < solution_count; s++)
+{
+    if (strcmp(user_solution, solutions[s]) == 0) 
     {
-
-    int x, y, z;
-    char p, q, r;
-
-    int flag = 0; // 添加一个标志变量，初始值为0
-
-    for (x = 0; x < 4; x++) // 三层循环遍历所有可能的情况，遇到==24的情况就打印出这个表达式，并将标志变量设置为1
-    {
-        p = ope[x];
-        for (y = 0; y < 4; y++)
-        {
-            q = ope[y];
-            for (z = 0; z < 4; z++)
-            {
-                r = ope[z];
-                if (express_1(i, j, k, t, p, q, r) == 24)
-                {
-                    printf("((%d %c %d) %c %d) %c %d = 24\n", i, p, j, q, k, r, t);
-                    flag = 1; // 如果找到了满足条件的表达式，就把标志变量设为1
-                }
-                if (express_2(i, j, k, t, p, q, r) == 24)
-                {
-                    printf("(%d %c (%d %c %d)) %c %d = 24\n", i, p, j, q, k, r, t);
-                    flag = 1;
-                }
-                if (express_3(i, j, k, t, p, q, r) == 24)
-                {
-                    printf("%d %c ((%d %c %d) %c %d) = 24\n", i, p, j, q, k, r, t);
-                    flag = 1;
-                }
-                if (express_4(i, j, k, t, p, q, r) == 24)
-                {
-                    printf("%d %c (%d %c (%d %c %d)) = 24\n", i, p, j, q, k, r, t);
-                    flag = 1;
-                }
-                if (express_5(i, j, k, t, p, q, r) == 24)
-                {
-                    printf("(%d %c %d) %c (%d %c %d) = 24\n", i, p, j, q, k, r, t);
-                    flag = 1;
-                }
-            }
-        }
-    }
-
-    if (flag == 0) // 如果所有的循环结束后，标志变量仍然为0，就输出"没有值等于24"
-    {
-        printf("这四张牌组合不了24\n");
-    }
-
-    if (flag == 1)
-    { // 如果标志变量为1
-        printf("\n");
-        printf("所有能够出现24点的表达式有这些：\n");
-    }
+        printf("恭喜你，答案正确！\n");
+        return;
     }
 }
-    // main()函数是程序的入口点。它首先打印欢迎信息，然后调用num()函数让用户输入四个数。然后，通过三层嵌套循环，遍历所有可能的运算符组合，对每种组合，计算五种表达式的值，如果某个表达式的值等于24，就打印出这个表达式。
 
-    int main()
+    printf("很遗憾，答案错误。\n");
+    printf("是否查看答案？(y/n)\n");
+    char choice;
+    scanf(" %c", &choice);
+    if (choice == 'y' || choice == 'Y')
     {
-        printf("#**************************************#\n");
-        printf("#                                      #\n");
-        printf("#              欢迎来到                #\n");
-        printf("#                                      #\n");
-        printf("#             24点小游戏               #\n");
-        printf("#                                      #\n");
-        printf("#**************************************#\n");
+        printf("所有可能的解决方案如下：\n");
+        for (i = 0; i < solution_count; i++)
+        {
+            printf("%s\n", solutions[i]);
+        }
+    }
+}
+// main()函数是程序的入口点。它首先打印欢迎信息，然后调用num()函数让用户输入四个数。然后，通过三层嵌套循环，遍历所有可能的运算符组合，对每种组合，计算五种表达式的值，如果某个表达式的值等于24，就打印出这个表达式。
 
+int main()
+{
+    int mode;
+    char playAgain;
+
+    printf("#**************************************#\n");
+    printf("#                                      #\n");
+    printf("#              欢迎来到                #\n");
+    printf("#                                      #\n");
+    printf("#             24点小游戏               #\n");
+    printf("#                                      #\n");
+    printf("#**************************************#\n");
+
+    do {
         printf("请按回车开始游戏：\n");
         getchar();
 
         printf("请选择游戏模式：\n");
         printf("1. 输入四个数字，电脑给出解法\n");
         printf("2. 电脑给出四个数字，你自己解答\n");
-        int mode;
         scanf("%d", &mode);
         if (mode == 1)
         {
@@ -292,5 +280,9 @@ if(strcmp(user_input, "1") == 0)
             printf("无效的游戏模式！\n");
         }
 
-        return 0;
-    }
+        printf("你想再玩一次吗？ (y/n)\n");
+        scanf(" %c", &playAgain);
+    } while(playAgain == 'y' || playAgain == 'Y');
+
+    return 0;
+}
