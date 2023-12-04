@@ -4,16 +4,7 @@
 #include <time.h>
 #include <string.h>
 
-int n = 4;
-// 定义一个整数n，值为4
-int A[4] = {0};
-// 定义一个长度为4的整数数组A，所有元素初始化为0
-char oper[4] = {'+', '-', '*', '/'};
-// 定义一个长度为4的字符数组oper，存储四种运算符
-char B[4][50];
-// 定义一个二维字符数组B，可以看作是4个长度为50的字符串
-int count = 0;
-// 定义一个整数count，用于计数，初始值为0
+
 
 /*这个递归函数F的主要目标是找出所有可能的通过加、减、乘、除运算使得四个数字的结果为24的方式。
 
@@ -31,15 +22,24 @@ int count = 0;
 在每次运算前后，都会保存和恢复A[i]、A[j]、B[i]、B[j]的值，以确保在每次递归调用中，数组A和B的其他元素不会被改变。
 这个函数通过递归的方式枚举了所有可能的运算顺序和运算方式，从而找出所有可能的解。最后，函数F(n)会返回到main()函数中，打印出总共有多少种解法。*/
 
+
+
+double A[4];           // 存储四个数字
+char B[4][50];         // 存储四个数字对应的字符
 char answers[100][50]; // 存储所有可能的答案
 int answer_count = 0;  // 存储答案的数量
+
+// 题库，包含6道题目，每道题目有4个数字
+int question_bank[6][4] = {{1, 2, 3, 4}, {2, 3, 4, 5}, {2, 2, 3, 3}, {1, 3, 2, 4}, {1, 4, 2, 5}, {2, 2, 2, 2}};
+
+
 // 递归函数F，参数为整数n
 void F(int n)
 {
     // 如果n为1，检查A[0]是否为24，如果是，打印B[0]并增加计数
     if (n == 1)
     {
-        if (A[0] == 24)
+        if (fabs(A[0] - 24) < 1e-6)
         {
             strcpy(answers[answer_count], B[0]); // 将答案存储在answers中
             answer_count++;                      // 增加答案的数量
@@ -107,25 +107,16 @@ void game1()
     printf("请输入四个数字（1-13）：\n");
     for (int i = 0; i < 4; ++i)
     {
-        scanf("%d", &A[i]); // 读取用户输入的数字并存入数组A
+        scanf("%lf", &A[i]); // 读取用户输入的数字并存入数组A
     }
     printf("\n");
     // 将用户输入的数字转换为对应的字符并存入数组B
     for (int i = 0; i < 4; i++)
     {
-        if (A[i] == 1)
-            strcpy(B[i], "A");
-        else if (A[i] == 11)
-            strcpy(B[i], "J");
-        else if (A[i] == 12)
-            strcpy(B[i], "Q");
-        else if (A[i] == 13)
-            strcpy(B[i], "K");
-        else
-            sprintf(B[i], "%d", A[i]);
+        sprintf(B[i], "%.0lf", A[i]);
     }
     // 调用函数F，参数为n
-    F(n);
+    F(4);
 
     printf("\n总共有 %d 种解法\n", answer_count);
     for (int i = 0; i < answer_count; i++)
@@ -136,27 +127,30 @@ void game1()
 
 void game2()
 {
-    // 电脑随机生成四个数字
+    // 电脑从题库中随机选择一道题目
     srand(time(NULL)); // 设置随机数种子
+    int question_index = rand() % 10; // 生成一个0到9的随机数作为题目索引
     for (int i = 0; i < 4; ++i)
     {
-        A[i] = rand() % 13 + 1; // 生成一个1到13的随机数并存入数组A
+        A[i] = question_bank[question_index][i]; // 从题库中取出一道题目并存入数组A
+        sprintf(B[i], "%.0lf", A[i]); // 将数字转换为字符并存入数组B
     }
     // 打印出电脑生成的四个数字
     printf("电脑生成的四个数字是：\n");
     for (int i = 0; i < 4; ++i)
     {
-        printf("%d ", A[i]);
+        printf("%.0lf ", A[i]);
     }
     printf("\n");
 
     // 提示用户输入答案
-    printf("请输入您的答案：\n");
+    printf("请输入您的答案：(请在答案中带有小括号，即每次运算一步，就把自己的这步运算用小括号括起来）\n");
+     printf("**比如 1 2 3 4 答案格式为 (((1+2)+3)*4) \n");
     char answer[50];     // 定义一个长度为50的字符串answer，用于存储用户输入的答案
     scanf("%s", answer); // 读取用户输入的答案并存入answer
 
     // 调用函数F，参数为n
-    F(n);
+    F(4);
 
     // 检查用户输入的答案是否正确
     int correct = 0; // 定义一个整数correct，用于标记答案是否正确，初始值为0
@@ -174,27 +168,32 @@ void game2()
     else
     {
         printf("很遗憾，您的答案是错误的。\n");
-        printf("您想查看答案吗？（1-是，2-否）：\n");
-        int choice;           // 定义一个整数choice，用于存储用户是否想查看答案
-        scanf("%d", &choice); // 读取用户的选择并存入choice
-        if (choice == 1)
-        {
-            printf("正确答案是：\n");
-            for (int i = 0; i < answer_count; i++)
-            {
-                printf("%s\n", answers[i]); // 打印所有的答案
-            }
-        }
+    }
+    printf("正确答案是：\n");
+
+printf("是否查看答案？(y/n)\n");
+    char choice;
+    scanf(" %c", &choice);
+    if (choice == 'y' || choice == 'Y')
+    {
+        for (int i = 0; i < answer_count; i++)
+    {
+        printf("%s\n", answers[i]); // 打印所有的答案
+    }
     }
 }
+
+
+
+
+
 
 int main()
 {
     int mode;        // 定义一个整数mode，用于存储用户选择的游戏模式
-    char play_again; // 定义一个字符play_again，用于存储用户是否想再玩一次
+   
 
-    do
-    {
+    
         // 打印欢迎信息
         printf("#**************************************#\n");
         printf("#                                      #\n");
@@ -203,7 +202,8 @@ int main()
         printf("#             24点小游戏               #\n");
         printf("#                                      #\n");
         printf("#**************************************#\n");
-
+        printf("请按回车开始游戏：\n");
+        getchar();
         // 提示用户选择游戏模式
         printf("1. 输入四个数字，电脑给出解法\n");
         printf("2. 电脑给出四个数字，你自己解答\n");
@@ -218,10 +218,6 @@ int main()
             game2();
         }
 
-        // 提示用户是否想再玩一次
-        printf("你想再玩一次吗？（y/n）：\n");
-        scanf(" %c", &play_again);                    // 读取用户的选择并存入play_again
-    } while (play_again == 'y' || play_again == 'Y'); // 如果用户选择'y'或'Y'，则继续循环
-
+       
     return 0; // 主函数返回0
 }
