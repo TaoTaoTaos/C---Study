@@ -38,13 +38,23 @@ void F(int n)
 {
     // 如果n为1，检查A[0]是否为24，如果是，打印B[0]并增加计数
     if (n == 1)
+{
+    if (fabs(A[0] - 24) < 1e-6)
     {
-        if (fabs(A[0] - 24) < 1e-6)
+        // 检查是否已经存在相同的答案
+        for (int i = 0; i < answer_count; i++)
         {
-            strcpy(answers[answer_count], B[0]); // 将答案存储在answers中
-            answer_count++;                      // 增加答案的数量
+            if (strcmp(answers[i], B[0]) == 0)
+            {
+                return; // 如果找到相同的答案，就返回
+            }
         }
+
+        // 如果没有找到相同的答案，就存储当前的答案
+        strcpy(answers[answer_count], B[0]);
+        answer_count++;
     }
+}
 
     // 对于n个数，两两组合进行四则运算
     for (int i = 0; i < n; i++)
@@ -133,13 +143,13 @@ void game2()
     for (int i = 0; i < 4; ++i)
     {
         A[i] = question_bank[question_index][i]; // 从题库中取出一道题目并存入数组A
-        sprintf(B[i], "%.0lf", A[i]); // 将数字转换为字符并存入数组B
+        sprintf(B[i], "%d", A[i]); // 将数字转换为字符并存入数组B
     }
     // 打印出电脑生成的四个数字
     printf("电脑生成的四个数字是：\n");
     for (int i = 0; i < 4; ++i)
     {
-        printf("%.0lf ", A[i]);
+        printf("%d ", A[i]);
     }
     printf("\n");
 
@@ -182,7 +192,6 @@ printf("是否查看答案？(y/n)\n");
     }
     }
 }
-
 
 
 
