@@ -10,19 +10,21 @@
 #include <stdio.h>
 
 // 定义一个函数，使用辗转相除法求最大公约数
-int gcd(int a, int b) { //! 辗转相除法，也叫欧几里得算法，是求最大公约数的一种方法。
+int gcd(int a, int b)
+{                           //! 辗转相除法，也叫欧几里得算法，是求最大公约数的一种方法。
     return b == 0 ? a : gcd(b, a % b); //! 当b等于0时，a就是最大公约数。否则，继续递归调用gcd函数，直到b为0。
 }
 
-int main() {
+int main()
+{
     int m, n;
     printf("请输入两个正整数：");
     scanf("%d%d", &m, &n); // 输入两个正整数
 
-    int g = gcd(m, n); // 调用gcd函数求最大公约数
+    int g = gcd(m, n);               // 调用gcd函数求最大公约数
     printf("最大公约数是：%d\n", g); // 输出最大公约数
 
-    int l = m * n / g; // 使用公式求最小公倍数
+    int l = m * n / g;               // 使用公式求最小公倍数
     printf("最小公倍数是：%d\n", l); // 输出最小公倍数
 
     return 0;

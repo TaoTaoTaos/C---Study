@@ -15,7 +15,8 @@ int main()
     printf("请输入n，计算e的前n项展开值");
     scanf("%d",&n);
 
-    for (int i = n; i > 0; i--){
+    for (int i = n; i > 0; i--)
+    {
         double temp=Jiecheng(i);
         res += 1/temp;
         printf ("%f\n",res);
