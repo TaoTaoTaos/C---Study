@@ -16,28 +16,35 @@ dp[i][j]表示数字j的拆分方式中，最大的数字不超过i的拆分方�
 
 #include <stdio.h>
 
-int main() {
+int main()
+{
     int n;
-    scanf("%d", &n);  // 输入一个正整数n
-    int dp[n+1][n+1];  // 定义动态规划数组
+    scanf("%d", &n);      // 输入一个正整数n
+    int dp[n + 1][n + 1]; // 定义动态规划数组
 
     // 初始化动态规划数组
-    for (int i = 0; i <= n; i++) {
-        dp[i][0] = 1;  // 数字0的拆分方式只有一种，就是不拆分
+    for (int i = 0; i <= n; i++)
+    {
+        dp[i][0] = 1; // 数字0的拆分方式只有一种，就是不拆分
     }
 
     // 动态规划求解
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= n; j++) {
-            if (i > j) {
-                dp[i][j] = dp[i-1][j];  // 当前的i大于j，所以拆分方式与i-1时相同
-            } else {
-                dp[i][j] = dp[i-1][j] + dp[i][j-i];  // 当前的i小于等于j，所以拆分方式为i-1时的拆分方式和j-i时的拆分方式之和
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 1; j <= n; j++)
+        {
+            if (i > j)
+            {
+                dp[i][j] = dp[i - 1][j]; // 当前的i大于j，所以拆分方式与i-1时相同
+            }
+            else
+            {
+                dp[i][j] = dp[i - 1][j] + dp[i][j - i]; // 当前的i小于等于j，所以拆分方式为i-1时的拆分方式和j-i时的拆分方式之和
             }
         }
     }
 
-    printf("%d\n", dp[n][n]);  // 输出结果
+    printf("%d\n", dp[n][n]); // 输出结果
 
     return 0;
 }
